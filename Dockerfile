@@ -2,13 +2,15 @@ FROM node:20.16.0-alpine AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
-RUN npm i -g pnpm
+# 安装特定版本的 pnpm（与项目匹配的版本）
+RUN npm i -g pnpm@8.15.1
 
 FROM base AS build
 COPY . /usr/src/app
 WORKDIR /usr/src/app
 
-RUN pnpm install --frozen-lockfile
+# 使用 --force 重新生成 lockfile
+RUN pnpm install --force
 
 RUN pnpm run -r build
 
