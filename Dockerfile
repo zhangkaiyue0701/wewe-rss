@@ -2,14 +2,12 @@ FROM node:20.16.0-alpine AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
-# 安装特定版本的 pnpm
 RUN npm i -g pnpm@8.15.1
 
 FROM base AS build
 COPY . /usr/src/app
 WORKDIR /usr/src/app
 
-# 使用 --force 重新生成 lockfile
 RUN pnpm install --force
 
 RUN pnpm run -r build
@@ -29,12 +27,8 @@ COPY --from=build /app-sqlite /app
 
 WORKDIR /app
 
-# 创建数据目录并设置权限
 RUN mkdir -p /data && \
     chown -R node:node /data
-
-# 添加数据卷
-VOLUME /data
 
 EXPOSE 3000
 
@@ -49,7 +43,6 @@ ENV DATABASE_TYPE="sqlite"
 
 RUN chmod +x ./docker-bootstrap.sh
 
-# 切换到非 root 用户
 USER node
 
 CMD ["./docker-bootstrap.sh"]
